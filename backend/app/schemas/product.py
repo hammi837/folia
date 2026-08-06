@@ -1,0 +1,1 @@
+# Product Pydantic schemas

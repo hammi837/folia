@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --folia-cream: #f7f3ee;
+  --folia-sand: #e8dfd4;
+  --folia-ink: #1c1917;
+  --folia-moss: #3f5d4a;
+  --folia-blush: #d4a5a5;
+}
+
+body {
+  margin: 0;
+  font-family: "DM Sans", system-ui, sans-serif;
+  background: var(--folia-cream);
+  color: var(--folia-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+}
