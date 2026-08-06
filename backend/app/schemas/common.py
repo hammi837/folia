@@ -1,1 +1,5 @@
-# Shared response schemas (Message, Paginated...)
+from pydantic import BaseModel
+
+
+class MessageOut(BaseModel):
+    message: str
