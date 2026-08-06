@@ -3,23 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --folia-cream: #f7f3ee;
-  --folia-sand: #e8dfd4;
-  --folia-ink: #1c1917;
-  --folia-moss: #3f5d4a;
-  --folia-blush: #d4a5a5;
+  --folia-cream: #f4efe6;
+  --folia-sand: #ddd2c4;
+  --folia-ink: #1a1f1c;
+  --folia-moss: #2f4a3a;
+  --folia-leaf: #5a7a62;
+  --folia-blush: #c9a090;
+  --folia-mist: #e8f0eb;
 }
 
-body {
-  margin: 0;
-  font-family: "DM Sans", system-ui, sans-serif;
-  background: var(--folia-cream);
-  color: var(--folia-ink);
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: "DM Sans", system-ui, sans-serif;
+    background-color: var(--folia-cream);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(47, 74, 58, 0.06), transparent 50%),
+      radial-gradient(ellipse at 90% 20%, rgba(201, 160, 144, 0.08), transparent 45%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    color: var(--folia-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    background: rgba(47, 74, 58, 0.2);
+  }
 }
 
-h1,
-h2,
-h3 {
-  font-family: "Fraunces", Georgia, serif;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }
