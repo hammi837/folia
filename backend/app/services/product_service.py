@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.product import Product
 from app.models.category import Category
+from app.models.review import Review
 
 
 def list_products(
@@ -47,7 +48,7 @@ def get_product_by_slug(db: Session, slug: str) -> Product | None:
             joinedload(Product.images),
             joinedload(Product.variants),
             joinedload(Product.category),
-            joinedload(Product.reviews),
+            joinedload(Product.reviews).joinedload(Review.user),
         )
         .filter(Product.slug == slug, Product.is_active.is_(True))
         .first()

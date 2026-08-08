@@ -19,6 +19,7 @@ export const useAuthStore = create(
       hydrateUser: async () => {
         const token = get().token || localStorage.getItem("folia_token");
         if (!token) return null;
+        localStorage.setItem("folia_token", token);
         try {
           const { data } = await api.get("/auth/me");
           set({ token, user: data });
@@ -33,6 +34,9 @@ export const useAuthStore = create(
     {
       name: "folia-auth",
       partialize: (s) => ({ token: s.token, user: s.user }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.token) localStorage.setItem("folia_token", state.token);
+      },
     }
   )
 );
