@@ -1,4 +1,6 @@
-from sqlalchemy import String, Text
+from decimal import Decimal
+
+from sqlalchemy import String, Text, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
@@ -11,5 +13,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(120), unique=True)
     slug: Mapped[str] = mapped_column(String(140), unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    discount_percent: Mapped[Decimal | None] = mapped_column(Numeric(5, 2), nullable=True)
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     products = relationship("Product", back_populates="category")

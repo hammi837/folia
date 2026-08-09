@@ -21,6 +21,7 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     compare_at_price: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    discount_percent: Mapped[Decimal | None] = mapped_column(Numeric(5, 2), nullable=True)
     category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
     concerns: Mapped[list | None] = mapped_column(JSON, default=list)
     ingredients: Mapped[list | None] = mapped_column(JSON, default=list)
@@ -29,6 +30,7 @@ class Product(Base):
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     stock: Mapped[int] = mapped_column(Integer, default=50)
+    low_stock_threshold: Mapped[int] = mapped_column(Integer, default=10)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     category = relationship("Category", back_populates="products")
