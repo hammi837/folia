@@ -10,6 +10,10 @@ from app.api.v1.routes import (
     quiz,
     reviews,
     checkout,
+    admin,
+    promos,
+    site_settings,
+    content_cards,
 )
 
 api_router = APIRouter()
@@ -23,6 +27,10 @@ api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])
 api_router.include_router(quiz.router, prefix="/quiz", tags=["Quiz"])
 api_router.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])
 api_router.include_router(checkout.router, prefix="/checkout", tags=["Checkout"])
+api_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(promos.router, prefix="/promos", tags=["Promos"])
+api_router.include_router(site_settings.router, prefix="/settings", tags=["Settings"])
+api_router.include_router(content_cards.router, prefix="/content-cards", tags=["Content cards"])
 
 
 @api_router.get("/")
