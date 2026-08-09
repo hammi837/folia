@@ -17,6 +17,11 @@ def absolute_media(url: str | None) -> str | None:
         return None
     if value.startswith("http://") or value.startswith("https://") or value.startswith("data:"):
         return value
+    # Host without scheme (e.g. folia....railway.app/uploads/...) — common mis-set PUBLIC_BASE_URL
+    if value.startswith("//"):
+        return f"https:{value}"
+    if not value.startswith("/") and ("." in value.split("/", 1)[0]):
+        return f"https://{value}"
     base = (settings.PUBLIC_BASE_URL or "").rstrip("/")
     if base and value.startswith("/"):
         return f"{base}{value}"

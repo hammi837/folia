@@ -199,8 +199,9 @@ async def upload_image(
     content = await file.read()
     dest.write_bytes(content)
     path = f"/uploads/products/{name}"
-    base = (settings.PUBLIC_BASE_URL or "").rstrip("/")
-    return {"url": f"{base}{path}" if base else path}
+    from app.services.pricing import absolute_media
+
+    return {"url": absolute_media(path) or path}
 
 
 

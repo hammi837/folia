@@ -46,7 +46,10 @@ class Settings(BaseSettings):
             sep = "&" if "?" in url else "?"
             self.DATABASE_URL = f"{url}{sep}sslmode=require"
         if self.PUBLIC_BASE_URL:
-            self.PUBLIC_BASE_URL = self.PUBLIC_BASE_URL.rstrip("/")
+            base = self.PUBLIC_BASE_URL.strip().rstrip("/")
+            if base and not base.startswith(("http://", "https://")):
+                base = f"https://{base}"
+            self.PUBLIC_BASE_URL = base
 
 
 settings = Settings()

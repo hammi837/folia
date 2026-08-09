@@ -4,8 +4,15 @@
  */
 export function mediaUrl(src) {
   if (!src) return null;
-  if (/^https?:\/\//i.test(src) || src.startsWith("data:")) return src;
-  if (!src.startsWith("/")) return src;
+  let value = String(src).trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value) || value.startsWith("data:")) return value;
+  if (value.startsWith("//")) return `https:${value}`;
+  // Protocol-less host (e.g. api.example.com/uploads/...) from a mis-set PUBLIC_BASE_URL
+  if (!value.startsWith("/") && value.includes(".") && /^[a-z0-9.-]+\.[a-z]{2,}([/:?]|$)/i.test(value)) {
+    return `https://${value}`;
+  }
+  if (!value.startsWith("/")) return value;
 
   let api = String(import.meta.env.VITE_API_URL || "").trim();
   if (api && !/^https?:\/\//i.test(api)) {
@@ -18,9 +25,9 @@ export function mediaUrl(src) {
     if (import.meta.env.PROD) {
       origin = "https://folia-production-c0f7.up.railway.app";
     } else {
-      return src;
+      return value;
     }
   }
 
-  return `${origin}${src}`;
+  return `${origin}${value}`;
 }

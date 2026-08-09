@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mediaUrl } from "../../lib/mediaUrl";
 
 /**
@@ -14,6 +14,11 @@ export default function SoftImage({
 }) {
   const [broken, setBroken] = useState(false);
   const resolved = mediaUrl(src);
+
+  useEffect(() => {
+    setBroken(false);
+  }, [resolved]);
+
   const showImg = Boolean(resolved) && !broken;
 
   if (!showImg) {
