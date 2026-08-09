@@ -3,8 +3,24 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models.product import Product
 from app.models.promo import Offer
+
+
+def absolute_media(url: str | None) -> str | None:
+    """Prefix relative /uploads paths with PUBLIC_BASE_URL when set."""
+    if not url:
+        return None
+    value = str(url).strip()
+    if not value:
+        return None
+    if value.startswith("http://") or value.startswith("https://") or value.startswith("data:"):
+        return value
+    base = (settings.PUBLIC_BASE_URL or "").rstrip("/")
+    if base and value.startswith("/"):
+        return f"{base}{value}"
+    return value
 
 
 def _aware(dt: datetime | None) -> datetime | None:
@@ -73,7 +89,12 @@ def resolve_discount(product: Product, offers: list[Offer] | None = None) -> tup
 def serialize_product(product: Product, offers: list[Offer] | None = None, *, detail: bool = False) -> dict:
     sale_price, pct, source = resolve_discount(product, offers)
     images = [
-        {"id": i.id, "url": i.url, "alt": i.alt, "sort_order": i.sort_order}
+        {
+            "id": i.id,
+            "url": absolute_media(i.url),
+            "alt": i.alt,
+            "sort_order": i.sort_order,
+        }
         for i in sorted(product.images or [], key=lambda x: x.sort_order)
     ]
     category = None
@@ -84,7 +105,7 @@ def serialize_product(product: Product, offers: list[Offer] | None = None, *, de
             "slug": product.category.slug,
             "description": product.category.description,
             "discount_percent": product.category.discount_percent,
-            "image_url": getattr(product.category, "image_url", None),
+            "image_url": absolute_media(getattr(product.category, "image_url", None)),
         }
 
     threshold = getattr(product, "low_stock_threshold", 10) or 10

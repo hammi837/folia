@@ -29,8 +29,30 @@ def _is_active_window(obj) -> bool:
 
 @router.get("/offers", response_model=list[OfferOut])
 def public_offers(db: Session = Depends(get_db)):
+    from app.services.pricing import absolute_media
+
     offers = db.query(Offer).filter(Offer.is_active.is_(True)).order_by(Offer.id.desc()).all()
-    return [o for o in offers if _is_active_window(o)]
+    out = []
+    for o in offers:
+        if not _is_active_window(o):
+            continue
+        out.append(
+            OfferOut(
+                id=o.id,
+                title=o.title,
+                badge_text=o.badge_text,
+                description=o.description,
+                discount_percent=o.discount_percent,
+                image_url=absolute_media(o.image_url),
+                category_id=o.category_id,
+                product_id=o.product_id,
+                is_active=o.is_active,
+                starts_at=o.starts_at,
+                ends_at=o.ends_at,
+                created_at=o.created_at,
+            )
+        )
+    return out
 
 
 @router.post("/validate", response_model=PromoValidateOut)

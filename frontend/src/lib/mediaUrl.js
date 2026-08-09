@@ -7,9 +7,20 @@ export function mediaUrl(src) {
   if (/^https?:\/\//i.test(src) || src.startsWith("data:")) return src;
   if (!src.startsWith("/")) return src;
 
-  const api = import.meta.env.VITE_API_URL || "";
-  // VITE_API_URL is like https://api.example.com/api/v1 → origin is before /api
-  const origin = api.replace(/\/api\/v1\/?$/, "").replace(/\/$/, "");
-  if (!origin || origin.startsWith("/")) return src;
+  let api = String(import.meta.env.VITE_API_URL || "").trim();
+  if (api && !/^https?:\/\//i.test(api)) {
+    api = `https://${api}`;
+  }
+
+  let origin = api.replace(/\/api\/v1\/?$/i, "").replace(/\/$/, "");
+  if (!origin || origin.startsWith("/")) {
+    // Safe production fallback when VITE_API_URL is missing/mis-set
+    if (import.meta.env.PROD) {
+      origin = "https://folia-production-c0f7.up.railway.app";
+    } else {
+      return src;
+    }
+  }
+
   return `${origin}${src}`;
 }
