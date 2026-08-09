@@ -6,8 +6,10 @@ import { useAuthStore } from "../../store/authStore";
 import { useUiStore } from "../../store/uiStore";
 
 const links = [
+  { to: "/", label: "Home", end: true },
   { to: "/shop", label: "Shop" },
   { to: "/quiz", label: "Skin Quiz" },
+  { to: "/about", label: "About" },
   { to: "/wishlist", label: "Wishlist" },
 ];
 
@@ -41,8 +43,8 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-40 border-b transition ${
         scrolled
-          ? "border-folia-sand/80 bg-folia-cream/90 backdrop-blur-md"
-          : "border-transparent bg-folia-cream/70 backdrop-blur-sm"
+          ? "border-folia-sand bg-folia-cream"
+          : "border-transparent bg-folia-cream/95"
       }`}
     >
       <div className="mx-auto flex max-w-site items-center justify-between px-4 py-4 md:px-6">
@@ -52,13 +54,18 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} className={linkClass}>
+            <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
               {l.label}
             </NavLink>
           ))}
         </nav>
 
         <div className="flex items-center gap-3 md:gap-5">
+          {user?.is_admin && (
+            <NavLink to="/admin" className="hidden text-sm text-folia-moss transition hover:text-folia-ink sm:inline">
+              Admin
+            </NavLink>
+          )}
           <NavLink
             to={user ? "/account" : "/login"}
             className="hidden text-sm text-folia-ink/80 transition hover:text-folia-moss sm:inline"
@@ -107,12 +114,18 @@ export default function Navbar() {
                 <NavLink
                   key={l.to}
                   to={l.to}
+                  end={l.end}
                   className="rounded-xl px-3 py-3 text-base"
                   onClick={() => setOpen(false)}
                 >
                   {l.label}
                 </NavLink>
               ))}
+              {user?.is_admin && (
+                <NavLink to="/admin" className="rounded-xl px-3 py-3 text-base" onClick={() => setOpen(false)}>
+                  Admin
+                </NavLink>
+              )}
               <NavLink
                 to={user ? "/account" : "/login"}
                 className="rounded-xl px-3 py-3 text-base"

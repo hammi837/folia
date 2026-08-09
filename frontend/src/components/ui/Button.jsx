@@ -5,6 +5,8 @@ const variants = {
     "bg-folia-moss text-folia-cream hover:bg-folia-ink border border-transparent",
   secondary:
     "bg-transparent text-folia-ink border border-folia-ink/20 hover:border-folia-moss hover:text-folia-moss",
+  secondaryLight:
+    "bg-transparent text-folia-cream border border-folia-cream/55 hover:bg-folia-cream/10 hover:border-folia-cream",
   ghost: "bg-transparent text-folia-ink/80 hover:text-folia-moss border border-transparent",
   light:
     "bg-folia-cream text-folia-ink border border-transparent hover:bg-white",
