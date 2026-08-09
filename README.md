@@ -207,7 +207,7 @@ folia/
 
 ## Docs
 
-- [Deploy free (Neon + Koyeb + Vercel)](docs/DEPLOY.md)
+- [Deploy free (Neon + Railway + Vercel)](docs/DEPLOY.md)
 - [Gig / demo checklist](docs/GIG.md)
 - [Structure notes](docs/STRUCTURE.md)
 

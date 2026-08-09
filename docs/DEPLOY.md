@@ -1,11 +1,9 @@
-# Deploy FOLIA free: Neon + Koyeb + Vercel
-
-Stack:
+# Deploy FOLIA free: Neon + Railway + Vercel
 
 ```text
 Browser → Vercel (React)
               ↓
-         Koyeb (FastAPI)
+         Railway (FastAPI)
               ↓
          Neon (PostgreSQL)
 ```
@@ -14,41 +12,23 @@ Browser → Vercel (React)
 
 ## 1) Neon (database)
 
-1. Sign up at [neon.tech](https://neon.tech)
-2. Create a project (region closest to you)
-3. Open **Dashboard → Connection details**
-4. Copy the connection string (URI), e.g.
+1. [neon.tech](https://neon.tech) → create project  
+2. **Connect** → copy **URI**  
+3. Prefer this form (drop `channel_binding` if Python fails to connect):
 
 ```text
-postgresql://USER:PASSWORD@ep-xxxx.region.aws.neon.tech/neondb?sslmode=require
+postgresql://USER:PASSWORD@ep-XXXX.REGION.aws.neon.tech/neondb?sslmode=require
 ```
-
-Keep this for Koyeb as `DATABASE_URL`.
 
 ---
 
-## 2) Koyeb (FastAPI backend)
+## 2) Railway (FastAPI backend)
 
-### A. Create the service
+1. Go to [railway.app](https://railway.app) → login with GitHub  
+2. **New Project** → **Deploy from GitHub repo** → select `hammi837/folia`  
+3. Railway will detect the root **`Dockerfile`** (already in the repo)
 
-1. Sign up at [koyeb.com](https://www.koyeb.com)
-2. **Create App → Deploy from GitHub**
-3. Select repo `hammi837/folia`
-4. Settings:
-
-| Field | Value |
-|--------|--------|
-| Builder | **Dockerfile** |
-| Dockerfile location | `backend/Dockerfile` |
-| Build context / work directory | `backend` (or repo root if Koyeb asks for path to Dockerfile directory) |
-| Exposed port | `8000` (or leave default; container listens on `$PORT`) |
-| Health check path | `/health` |
-
-If the UI asks for **Root directory**, set it to `backend`.
-
-### B. Environment variables (Koyeb)
-
-Add these (replace values):
+### Variables (Railway → your service → Variables)
 
 ```env
 APP_NAME=FOLIA
@@ -57,10 +37,10 @@ DEBUG=false
 SECRET_KEY=generate-a-long-random-string
 ACCESS_TOKEN_EXPIRE_MINUTES=10080
 
-DATABASE_URL=postgresql://USER:PASSWORD@ep-xxxx.region.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://USER:PASSWORD@ep-XXXX.REGION.aws.neon.tech/neondb?sslmode=require
 
-FRONTEND_URL=https://YOUR-VERCEL-APP.vercel.app
-PUBLIC_BASE_URL=https://YOUR-KOYEB-APP.koyeb.app
+FRONTEND_URL=https://YOUR-APP.vercel.app
+PUBLIC_BASE_URL=https://YOUR-RAILWAY-URL.up.railway.app
 
 STORE_TIMEZONE=Asia/Karachi
 
@@ -68,35 +48,39 @@ STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 ```
 
-Notes:
+### Generate a public URL
 
-- Set `PUBLIC_BASE_URL` to the **Koyeb public URL** (no trailing slash).
-- After first deploy you will know the exact Koyeb URL — save it, then update `PUBLIC_BASE_URL` and redeploy if needed.
-- `FRONTEND_URL` must match your Vercel URL for CORS (update after Vercel deploy if needed).
+1. Service → **Settings** → **Networking** → **Generate Domain**  
+2. Copy that URL (e.g. `https://folia-production-xxxx.up.railway.app`)  
+3. Set `PUBLIC_BASE_URL` to that URL (no trailing slash)  
+4. Redeploy if you added it after the first deploy  
 
-### C. Deploy & seed
+### Health check
 
-1. Deploy and wait until **Healthy**
-2. Open `https://YOUR-KOYEB-APP.koyeb.app/health` → should return `{"status":"ok",...}`
-3. Open `https://YOUR-KOYEB-APP.koyeb.app/docs`
-4. Seed the database once.
+Open:
 
-**Option A — from your PC** (easiest):
+```text
+https://YOUR-RAILWAY-URL.up.railway.app/health
+```
+
+Should return `{"status":"ok","app":"FOLIA"}`.
+
+Docs: `https://YOUR-RAILWAY-URL.up.railway.app/docs`
+
+### Seed the database (once)
+
+On your PC:
 
 ```bash
 cd backend
 .\.venv\Scripts\activate
-# Temporarily point local .env DATABASE_URL to Neon
-python -m app.seed
 ```
 
-**Option B — Koyeb one-off / console** (if available):
+Put the **same Neon** `DATABASE_URL` in `backend/.env`, then:
 
 ```bash
 python -m app.seed
 ```
-
-Demo logins after seed:
 
 | Role | Email | Password |
 |------|--------|----------|
@@ -107,84 +91,74 @@ Demo logins after seed:
 
 ## 3) Vercel (React frontend)
 
-1. Sign up at [vercel.com](https://vercel.com)
-2. **Add New Project** → import `hammi837/folia`
-3. Settings:
+1. [vercel.com](https://vercel.com) → **Add New Project** → import `hammi837/folia`  
+2. Settings:
 
 | Field | Value |
 |--------|--------|
-| Framework | Vite |
 | Root Directory | `frontend` |
+| Framework | Vite |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
-| Install Command | `npm install` |
 
-4. Environment variable:
-
-```env
-VITE_API_URL=https://YOUR-KOYEB-APP.koyeb.app/api/v1
-```
-
-5. Deploy
-
-6. Copy the Vercel URL (e.g. `https://folia-xxx.vercel.app`)
-
-7. Go back to **Koyeb** → set:
+3. Environment variable:
 
 ```env
-FRONTEND_URL=https://folia-xxx.vercel.app
+VITE_API_URL=https://YOUR-RAILWAY-URL.up.railway.app/api/v1
 ```
 
-Redeploy the API so CORS allows your storefront.
+4. Deploy → copy the Vercel URL  
+
+5. Back on **Railway**, set:
+
+```env
+FRONTEND_URL=https://YOUR-VERCEL-APP.vercel.app
+```
+
+Redeploy Railway so CORS allows the storefront.
 
 ---
 
-## 4) Smoke test checklist
+## Build / start (already in repo)
 
-- [ ] `https://YOUR-KOYEB-APP.koyeb.app/health` OK  
-- [ ] `https://YOUR-KOYEB-APP.koyeb.app/docs` loads  
-- [ ] Vercel home page loads products  
-- [ ] Login as admin → `/admin`  
-- [ ] Upload an image (site images / product)  
-- [ ] Checkout with promo `FOLIA10` (mock Stripe OK)
+| Host | What it uses |
+|------|----------------|
+| **Railway** | Root `Dockerfile` → `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+| **Vercel** | `frontend` → `npm run build` → `dist` |
 
 ---
 
-## Build / start commands (summary)
+## If Railway build fails
 
-### Koyeb (Dockerfile already in repo)
+1. Confirm latest `main` includes `Dockerfile` (commit: *Add Docker and deploy config…*)  
+2. Service **Settings** → Builder = **Dockerfile**  
+3. Dockerfile path = `/Dockerfile` (repo root)  
+4. Do **not** set root directory to `frontend`  
 
-- **Dockerfile:** `backend/Dockerfile`
-- **Start command (inside image):**  
-  `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}`
+Optional: if you prefer building only from `backend/`:
 
-### Vercel
-
-- **Root:** `frontend`
-- **Build:** `npm run build`
-- **Output:** `dist`
-- **Env:** `VITE_API_URL=https://<koyeb>/api/v1`
+- Root Directory = `backend`  
+- Dockerfile path = `Dockerfile` (the one inside `backend/`)
 
 ---
 
-## Files added for deploy
+## Smoke test
 
-| File | Purpose |
-|------|---------|
-| `backend/Dockerfile` | Container image for Koyeb |
-| `backend/.dockerignore` | Smaller / safer builds |
-| `frontend/vercel.json` | SPA rewrites for React Router |
-| `frontend/src/lib/mediaUrl.js` | Fix `/uploads/...` on separate hosts |
-| `PUBLIC_BASE_URL` env | Absolute upload URLs from API |
+- [ ] Railway `/health` OK  
+- [ ] Railway `/docs` loads  
+- [ ] Vercel home loads products  
+- [ ] Login admin → `/admin`  
+- [ ] Upload image works  
+- [ ] Checkout + promo `FOLIA10`  
 
 ---
 
-## Free-tier caveats
+## Free-tier notes
 
-- Koyeb free apps may **sleep** when idle → first request can be slow  
-- Uploaded files live on the container disk → **can disappear on redeploy** (re-upload or later use Cloudinary)  
-- Neon free tier has storage / compute limits  
-- Keep Stripe in **test** mode for demos  
+- Railway free/trial credits run out — watch the usage bar  
+- Neon free DB is fine for demos  
+- Uploaded images on Railway disk can reset on redeploy — re-upload or use Cloudinary later  
+- Keep Stripe in **test** mode  
 
 ---
 
@@ -192,8 +166,8 @@ Redeploy the API so CORS allows your storefront.
 
 | Problem | Fix |
 |---------|-----|
-| CORS error in browser | `FRONTEND_URL` on Koyeb must equal exact Vercel URL (https, no trailing slash) |
-| Images 404 on Vercel | Set `VITE_API_URL` and `PUBLIC_BASE_URL`; hard refresh |
-| DB connection failed | Neon URI must include `?sslmode=require` |
-| Empty catalogue | Run `python -m app.seed` against Neon |
-| Admin 401 | Use seeded admin; token expiry is long (`ACCESS_TOKEN_EXPIRE_MINUTES`) |
+| CORS errors | `FRONTEND_URL` on Railway = exact Vercel URL |
+| Images 404 | Set `VITE_API_URL` + `PUBLIC_BASE_URL` |
+| DB connect fail | Neon URI with `?sslmode=require` only |
+| Empty shop | Run `python -m app.seed` against Neon |
+| Build failed | Redeploy after `Dockerfile` is on `main` |
