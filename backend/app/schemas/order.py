@@ -18,6 +18,7 @@ class CheckoutIn(BaseModel):
     shipping_country: str
     shipping_postal: str
     items: list[CheckoutItemIn]
+    promo_code: str | None = None
 
 
 class OrderItemOut(BaseModel):
@@ -35,6 +36,9 @@ class OrderOut(BaseModel):
     email: str
     status: str
     total: Decimal
+    subtotal: Decimal | None = None
+    discount_amount: Decimal | None = None
+    promo_code: str | None = None
     shipping_name: str
     shipping_address: str
     shipping_city: str
