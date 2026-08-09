@@ -66,7 +66,11 @@ export default function ProductDetail() {
   const wished = wishlistIds.includes(product.id);
 
   const onAdd = () => {
-    addItem(product, 1, variant);
+    const priced = {
+      ...product,
+      price: Number(product.sale_price ?? product.price),
+    };
+    addItem(priced, 1, variant);
     showToast("Added to bag");
     openCart();
   };
@@ -106,7 +110,21 @@ export default function ProductDetail() {
           {product.category && <Badge>{product.category.name}</Badge>}
           <h1 className="mt-4 font-display text-4xl md:text-5xl">{product.name}</h1>
           <p className="mt-3 text-folia-ink/65">{product.short_description}</p>
-          <p className="mt-5 text-xl font-medium">${Number(product.price).toFixed(2)}</p>
+          <p className="mt-5 text-xl font-medium">
+            {product.applied_discount_percent ? (
+              <>
+                <span className="mr-2 text-base text-folia-ink/40 line-through">
+                  ${Number(product.price).toFixed(2)}
+                </span>
+                ${Number(product.sale_price ?? product.price).toFixed(2)}
+                <span className="ml-2 text-sm text-folia-moss">
+                  −{Number(product.applied_discount_percent)}%
+                </span>
+              </>
+            ) : (
+              <>${Number(product.price).toFixed(2)}</>
+            )}
+          </p>
 
           {product.variants?.length > 0 && (
             <div className="mt-6">
@@ -191,7 +209,7 @@ export default function ProductDetail() {
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-folia-sand bg-folia-cream/95 p-4 backdrop-blur md:hidden">
         <Button className="w-full" onClick={onAdd}>
-          Add to bag · ${Number(product.price).toFixed(2)}
+          Add to bag · ${Number(product.sale_price ?? product.price).toFixed(2)}
         </Button>
       </div>
     </section>
