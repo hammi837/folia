@@ -1,42 +1,40 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import api from "../services/api";
+import { useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSession as setSessionAction, logout as logoutAction, hydrateUser } from "./slices/authSlice";
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      token: null,
-      user: null,
-      setSession: (token, user) => {
-        if (token) localStorage.setItem("folia_token", token);
-        else localStorage.removeItem("folia_token");
-        set({ token, user });
-      },
-      logout: () => {
-        localStorage.removeItem("folia_token");
-        set({ token: null, user: null });
-      },
-      hydrateUser: async () => {
-        const token = get().token || localStorage.getItem("folia_token");
-        if (!token) return null;
-        localStorage.setItem("folia_token", token);
-        try {
-          const { data } = await api.get("/auth/me");
-          set({ token, user: data });
-          return data;
-        } catch {
-          localStorage.removeItem("folia_token");
-          set({ token: null, user: null });
-          return null;
-        }
-      },
+/** Redux-backed auth hook (same selector API as the old Zustand store). */
+export function useAuthStore(selector) {
+  const dispatch = useDispatch();
+  const token = useSelector((s) => s.auth.token);
+  const user = useSelector((s) => s.auth.user);
+
+  const setSession = useCallback(
+    (nextToken, nextUser) => {
+      dispatch(setSessionAction({ token: nextToken, user: nextUser }));
+    },
+    [dispatch]
+  );
+
+  const logout = useCallback(() => {
+    dispatch(logoutAction());
+  }, [dispatch]);
+
+  const hydrate = useCallback(async () => {
+    const result = await dispatch(hydrateUser());
+    if (hydrateUser.fulfilled.match(result)) return result.payload?.user ?? null;
+    return null;
+  }, [dispatch]);
+
+  const api = useMemo(
+    () => ({
+      token,
+      user,
+      setSession,
+      logout,
+      hydrateUser: hydrate,
     }),
-    {
-      name: "folia-auth",
-      partialize: (s) => ({ token: s.token, user: s.user }),
-      onRehydrateStorage: () => (state) => {
-        if (state?.token) localStorage.setItem("folia_token", state.token);
-      },
-    }
-  )
-);
+    [token, user, setSession, logout, hydrate]
+  );
+
+  return selector ? selector(api) : api;
+}
