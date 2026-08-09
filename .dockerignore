@@ -1,0 +1,14 @@
+frontend
+backend/.venv
+backend/__pycache__
+**/__pycache__
+**/*.pyc
+.env
+**/.env
+!**/.env.example
+backend/uploads/products/*
+!backend/uploads/products/.gitkeep
+.git
+docs
+*.md
+!README.md

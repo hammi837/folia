@@ -198,7 +198,9 @@ async def upload_image(
     dest = UPLOAD_DIR / name
     content = await file.read()
     dest.write_bytes(content)
-    return {"url": f"/uploads/products/{name}"}
+    path = f"/uploads/products/{name}"
+    base = (settings.PUBLIC_BASE_URL or "").rstrip("/")
+    return {"url": f"{base}{path}" if base else path}
 
 
 

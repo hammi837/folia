@@ -11,6 +11,7 @@ import ReviewsScroller from "../components/home/ReviewsScroller";
 import Spinner from "../components/ui/Spinner";
 import ContentCardView, { contentCardSpanClass } from "../components/ui/ContentCardView";
 import api from "../services/api";
+import { mediaUrl } from "../lib/mediaUrl";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const FALLBACK_BRAND = [
@@ -99,7 +100,7 @@ export default function Home() {
         {heroImage ? (
           <motion.img
             key={heroImage}
-            src={heroImage}
+            src={mediaUrl(heroImage)}
             alt="FOLIA clean beauty ritual"
             className="absolute inset-0 h-full w-full object-cover"
             initial={reduced ? false : { scale: 1.14 }}
@@ -189,7 +190,7 @@ export default function Home() {
                   >
                     {offer.image_url && (
                       <img
-                        src={offer.image_url}
+                        src={mediaUrl(offer.image_url)}
                         alt={offer.title}
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                       />

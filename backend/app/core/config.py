@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = ""
 
     FRONTEND_URL: str = "http://localhost:5173"
+    # Public API origin for absolute upload URLs in production (e.g. https://folia-api.koyeb.app)
+    PUBLIC_BASE_URL: str = ""
     STORE_TIMEZONE: str = "Asia/Karachi"
 
     STRIPE_SECRET_KEY: str = ""
@@ -38,6 +40,13 @@ class Settings(BaseSettings):
                 f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}"
                 f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             )
+        # Neon and many cloud Postgres hosts require SSL
+        url = self.DATABASE_URL or ""
+        if "neon.tech" in url and "sslmode=" not in url:
+            sep = "&" if "?" in url else "?"
+            self.DATABASE_URL = f"{url}{sep}sslmode=require"
+        if self.PUBLIC_BASE_URL:
+            self.PUBLIC_BASE_URL = self.PUBLIC_BASE_URL.rstrip("/")
 
 
 settings = Settings()

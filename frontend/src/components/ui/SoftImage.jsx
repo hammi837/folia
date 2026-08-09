@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { mediaUrl } from "../../lib/mediaUrl";
 
 /**
  * Renders an image when `src` is set; otherwise a soft brand placeholder.
@@ -12,7 +13,8 @@ export default function SoftImage({
   placeholderLabel = "FOLIA",
 }) {
   const [broken, setBroken] = useState(false);
-  const showImg = Boolean(src) && !broken;
+  const resolved = mediaUrl(src);
+  const showImg = Boolean(resolved) && !broken;
 
   if (!showImg) {
     return (
@@ -28,7 +30,7 @@ export default function SoftImage({
 
   return (
     <img
-      src={src}
+      src={resolved}
       alt={alt}
       className={`${imgClassName} ${className}`}
       onError={() => setBroken(true)}

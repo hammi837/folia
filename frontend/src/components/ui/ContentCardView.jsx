@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { mediaUrl } from "../../lib/mediaUrl";
 
 function pad(n) {
   return String(n).padStart(2, "0");
@@ -18,7 +19,7 @@ export default function ContentCardView({
 }) {
   const layout = card.layout || "text";
   const body = card.body || card.copy || "";
-  const image = card.image_url;
+  const image = mediaUrl(card.image_url);
   const onDark = tone === "onDark";
   const delay = Math.min(index * 0.06, 0.24);
 
