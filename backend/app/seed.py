@@ -7,7 +7,7 @@ from app.db.session import SessionLocal, engine, Base
 import app.db.base  # noqa: F401
 from app.models.user import User
 from app.models.category import Category
-from app.models.product import Product, ProductImage, ProductVariant
+from app.models.product import Product, ProductVariant
 from app.models.review import Review
 
 
@@ -39,7 +39,6 @@ PRODUCTS = [
             {"week": "Week 4", "note": "Barrier feels steadier day to day"},
         ],
         "featured": True,
-        "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800&q=80",
         "variant": {"name": "150 ml", "sku": "FOL-CLN-01"},
     },
     {
@@ -60,7 +59,6 @@ PRODUCTS = [
             {"week": "Week 3", "note": "Fewer congested patches"},
         ],
         "featured": False,
-        "image": "https://images.unsplash.com/photo-1570194065650-d99fb4b38b17?w=800&q=80",
         "variant": {"name": "120 ml", "sku": "FOL-CLN-02"},
     },
     {
@@ -83,7 +81,6 @@ PRODUCTS = [
             {"week": "Week 8", "note": "Soft glow holds through the day"},
         ],
         "featured": True,
-        "image": "https://images.unsplash.com/photo-1620916562916-7f62f4d0b0b8?w=800&q=80",
         "variant": {"name": "30 ml", "sku": "FOL-SER-01"},
     },
     {
@@ -105,7 +102,6 @@ PRODUCTS = [
             {"week": "Week 3", "note": "Redness flares soften"},
         ],
         "featured": True,
-        "image": "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=800&q=80",
         "variant": {"name": "30 ml", "sku": "FOL-SER-02"},
     },
     {
@@ -126,7 +122,6 @@ PRODUCTS = [
             {"week": "Week 2", "note": "Afternoon dryness fades"},
         ],
         "featured": True,
-        "image": "https://images.unsplash.com/photo-1608248543808-ba9c0f0f3c8c?w=800&q=80",
         "variant": {"name": "50 ml", "sku": "FOL-MOI-01"},
     },
     {
@@ -147,7 +142,6 @@ PRODUCTS = [
             {"week": "Week 6", "note": "Fine dryness lines look softer"},
         ],
         "featured": False,
-        "image": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&q=80",
         "variant": {"name": "50 ml", "sku": "FOL-MOI-02"},
     },
     {
@@ -168,7 +162,6 @@ PRODUCTS = [
             {"week": "Week 4", "note": "Texture feels silkier"},
         ],
         "featured": True,
-        "image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&q=80",
         "variant": {"name": "30 ml", "sku": "FOL-OIL-01"},
     },
     {
@@ -189,7 +182,6 @@ PRODUCTS = [
             {"week": "Week 4", "note": "Tone looks more even outdoors"},
         ],
         "featured": False,
-        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80",
         "variant": {"name": "40 ml", "sku": "FOL-MOI-03"},
     },
     {
@@ -209,7 +201,6 @@ PRODUCTS = [
             {"week": "Week 1", "note": "Skin feels less tight midday"},
         ],
         "featured": False,
-        "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
         "variant": {"name": "100 ml", "sku": "FOL-SER-03"},
     },
     {
@@ -230,18 +221,73 @@ PRODUCTS = [
             {"week": "Week 6", "note": "Spot marks fade gradually"},
         ],
         "featured": False,
-        "image": "https://images.unsplash.com/photo-1629198688000-71f23e745b69?w=800&q=80",
         "variant": {"name": "30 ml", "sku": "FOL-SER-04"},
     },
 ]
 
 
 def seed():
+    from app.db.migrate import ensure_schema_patches
+    from app.models.promo import PromoCode, Offer
+    from app.services.content_cards import ensure_default_content_cards
+
     Base.metadata.create_all(bind=engine)
+    ensure_schema_patches()
     db = SessionLocal()
     try:
+        # Always ensure admin + demo promo exist
+        admin = db.query(User).filter(User.email == "admin@folia.beauty").first()
+        if not admin:
+            admin = User(
+                email="admin@folia.beauty",
+                hashed_password=hash_password("admin123"),
+                full_name="FOLIA Admin",
+                is_admin=True,
+            )
+            db.add(admin)
+            print("Created admin@folia.beauty / admin123")
+        else:
+            admin.is_admin = True
+
+        demo = db.query(User).filter(User.email == "demo@folia.beauty").first()
+        if demo:
+            # keep demo as customer unless only user
+            pass
+
+        if not db.query(PromoCode).filter(PromoCode.code == "FOLIA10").first():
+            db.add(
+                PromoCode(
+                    code="FOLIA10",
+                    description="10% off sitewide",
+                    discount_type="percent",
+                    value=Decimal("10"),
+                    min_order=Decimal("40"),
+                    is_active=True,
+                )
+            )
+            print("Created promo FOLIA10")
+
+        if not db.query(Offer).filter(Offer.title == "Barrier Week").first():
+            db.add(
+                Offer(
+                    title="Barrier Week",
+                    badge_text="Save 15%",
+                    description="Quiet formulas for reactive skin — limited editorial offer.",
+                    discount_percent=Decimal("15"),
+                    image_url=None,
+                    is_active=True,
+                )
+            )
+            print("Created sample offer Barrier Week")
+
+        db.commit()
+
+        added_cards = ensure_default_content_cards(db)
+        if added_cards:
+            print(f"Seeded {added_cards} content cards")
+
         if db.query(Product).count() > 0:
-            print("Catalog already seeded — skipping.")
+            print("Catalog already seeded — admin/promo ensured.")
             return
 
         cats = {}
@@ -251,13 +297,14 @@ def seed():
             db.flush()
             cats[slug] = cat
 
-        demo = User(
-            email="demo@folia.beauty",
-            hashed_password=hash_password("folia123"),
-            full_name="FOLIA Demo",
-        )
-        db.add(demo)
-        db.flush()
+        if not demo:
+            demo = User(
+                email="demo@folia.beauty",
+                hashed_password=hash_password("folia123"),
+                full_name="FOLIA Demo",
+            )
+            db.add(demo)
+            db.flush()
 
         created_products = []
         for item in PRODUCTS:
@@ -277,22 +324,7 @@ def seed():
             )
             db.add(product)
             db.flush()
-            db.add(
-                ProductImage(
-                    product_id=product.id,
-                    url=item["image"],
-                    alt=item["name"],
-                    sort_order=0,
-                )
-            )
-            db.add(
-                ProductImage(
-                    product_id=product.id,
-                    url="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800&q=80",
-                    alt=f"{item['name']} lifestyle",
-                    sort_order=1,
-                )
-            )
+            # Images: upload via Admin → Products (no hardcoded URLs)
             v = item["variant"]
             db.add(
                 ProductVariant(
@@ -316,14 +348,45 @@ def seed():
                 Review(
                     product_id=created_products[idx].id,
                     user_id=demo.id,
+                    review_type="product",
                     rating=rating,
                     title=title,
                     body=body,
+                    is_public=True,
+                    show_on_home=True,
                 )
             )
 
+        db.add(
+            Review(
+                product_id=None,
+                user_id=demo.id,
+                review_type="brand",
+                rating=5,
+                title="Finally a quiet beauty shop",
+                body="First impression: calm design, clear rituals, no overwhelm. Felt like the brand already knew my shelf needed less.",
+                discovery_source="Skin quiz",
+                is_public=True,
+                show_on_home=True,
+            )
+        )
+        db.add(
+            Review(
+                product_id=None,
+                user_id=None,
+                guest_name="Amira",
+                review_type="brand",
+                rating=5,
+                title="Heard about FOLIA from a friend",
+                body="Soft packaging, honest copy, and a quiz that actually helped. Excited for my first order to arrive.",
+                discovery_source="A friend recommended",
+                is_public=True,
+                show_on_home=True,
+            )
+        )
+
         db.commit()
-        print("Seeded categories, 10 products, demo user demo@folia.beauty / folia123")
+        print("Seeded categories, 10 products, demo@folia.beauty / folia123, admin@folia.beauty / admin123")
     finally:
         db.close()
 

@@ -2,21 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.product import ProductListOut, ProductDetailOut, ReviewOut
-from app.services import product_service
+from app.schemas.product import ProductListOut, ProductDetailOut
+from app.services import product_service, pricing
 
 router = APIRouter()
-
-
-def _review_out(review) -> ReviewOut:
-    return ReviewOut(
-        id=review.id,
-        rating=review.rating,
-        title=review.title,
-        body=review.body,
-        created_at=review.created_at,
-        user_name=review.user.full_name if review.user else None,
-    )
 
 
 @router.get("/", response_model=list[ProductListOut])
@@ -29,7 +18,7 @@ def list_products(
     max_price: float | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
-    return product_service.list_products(
+    products = product_service.list_products(
         db,
         category=category,
         concern=concern,
@@ -38,6 +27,8 @@ def list_products(
         min_price=min_price,
         max_price=max_price,
     )
+    offers = pricing.get_active_offers(db)
+    return [pricing.serialize_product(p, offers) for p in products]
 
 
 @router.get("/{slug}", response_model=ProductDetailOut)
@@ -45,6 +36,5 @@ def product_detail(slug: str, db: Session = Depends(get_db)):
     product = product_service.get_product_by_slug(db, slug)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    data = ProductDetailOut.model_validate(product)
-    data.reviews = [_review_out(r) for r in product.reviews]
-    return data
+    offers = pricing.get_active_offers(db)
+    return pricing.serialize_product(product, offers, detail=True)

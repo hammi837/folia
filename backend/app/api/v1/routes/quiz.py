@@ -6,7 +6,7 @@ from app.core.deps import get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.product import ProductListOut
-from app.services import quiz_service
+from app.services import quiz_service, pricing
 
 router = APIRouter()
 
@@ -33,8 +33,9 @@ def recommend(
     answers = payload.model_dump()
     products = quiz_service.score_products(db, answers)
     result = quiz_service.save_quiz_result(db, answers, products, user)
+    offers = pricing.get_active_offers(db)
     return QuizOut(
         answers=answers,
-        recommendations=products,
+        recommendations=[pricing.serialize_product(p, offers) for p in products],
         quiz_result_id=result.id,
     )
