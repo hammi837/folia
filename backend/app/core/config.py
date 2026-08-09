@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     DEBUG: bool = True
     SECRET_KEY: str = "change-me"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days (local demo)
 
     # Prefer DATABASE_URL, or build from DB_* pieces
     DATABASE_URL: str | None = None
@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = ""
 
     FRONTEND_URL: str = "http://localhost:5173"
+    STORE_TIMEZONE: str = "Asia/Karachi"
 
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""

@@ -52,7 +52,8 @@ uvicorn app.main:app --reload --port 8000
 - API: http://localhost:8000  
 - Docs: http://localhost:8000/docs  
 
-**Demo user:** `demo@folia.beauty` / `folia123`
+**Demo user:** `demo@folia.beauty` / `folia123`  
+**Admin:** `admin@folia.beauty` / `admin123` → http://localhost:5173/admin
 
 ### 3. Frontend
 
@@ -64,6 +65,16 @@ npm run dev
 ```
 
 - Storefront: http://localhost:5173  
+- Admin: http://localhost:5173/admin  
+
+## Admin panel
+
+- Dashboard (products, orders, revenue, promos)
+- Products CRUD (images via URL, price, stock, featured)
+- Categories CRUD
+- Orders status updates
+- Promo codes (percent/fixed, min order, usage limit) — try `FOLIA10` at checkout
+- Offers (homepage campaign banners)
 
 ## Features
 
@@ -74,7 +85,8 @@ npm run dev
 - Skin quiz → scored product recommendations
 - Auth (register / login / JWT)
 - Wishlist (local)
-- Checkout (Stripe test or mock paid) + orders history
+- Checkout (Stripe test or mock paid) + promo codes + orders history
+- Admin CMS for catalogue, discounts, offers
 - Seeded catalogue (~10 products)
 
 ## Stripe

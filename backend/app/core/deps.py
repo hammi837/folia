@@ -34,3 +34,9 @@ def get_optional_user(
     if not user_id:
         return None
     return db.get(User, int(user_id))
+
+
+def get_admin_user(user: User = Depends(get_current_user)) -> User:
+    if not getattr(user, "is_admin", False):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    return user

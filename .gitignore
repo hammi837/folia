@@ -20,6 +20,10 @@ backend/.mypy_cache/
 backend/htmlcov/
 backend/.coverage
 
+# Uploads
+backend/uploads/products/*
+!backend/uploads/products/.gitkeep
+
 # Node
 frontend/node_modules/
 frontend/dist/
