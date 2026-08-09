@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../../services/api";
+import { asArray } from "../../lib/asArray";
 import CategoryCard from "./CategoryCard";
 import SectionHeading from "../ui/SectionHeading";
 import Spinner from "../ui/Spinner";
@@ -50,7 +51,7 @@ export default function CategoryShowcase() {
     api
       .get("/categories/")
       .then((res) => {
-        if (alive) setCategories(res.data);
+        if (alive) setCategories(asArray(res.data));
       })
       .catch(() => {
         if (alive) setCategories([]);

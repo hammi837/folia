@@ -5,6 +5,7 @@ import Button from "../components/ui/Button";
 import SoftImage from "../components/ui/SoftImage";
 import ContentCardView, { contentCardSpanClass } from "../components/ui/ContentCardView";
 import api from "../services/api";
+import { asArray } from "../lib/asArray";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const FALLBACK_PILLARS = [
@@ -121,8 +122,8 @@ export default function About() {
         story: settingsRes.data.about_story_image_url || null,
         ritual: settingsRes.data.about_ritual_image_url || null,
       });
-      if (pillarsRes.data?.length) setPillars(pillarsRes.data);
-      if (ritualRes.data?.length) setRitual(ritualRes.data);
+      if (asArray(pillarsRes.data).length) setPillars(asArray(pillarsRes.data));
+      if (asArray(ritualRes.data).length) setRitual(asArray(ritualRes.data));
     });
   }, []);
 

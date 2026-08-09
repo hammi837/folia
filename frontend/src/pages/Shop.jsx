@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import api from "../services/api";
+import { asArray } from "../lib/asArray";
 import ProductCard from "../components/product/ProductCard";
 import CategoryCard from "../components/home/CategoryCard";
 import SectionHeading from "../components/ui/SectionHeading";
@@ -29,7 +30,10 @@ export default function Shop() {
   };
 
   useEffect(() => {
-    api.get("/categories/").then((res) => setCategories(res.data)).catch(() => setCategories([]));
+    api
+      .get("/categories/")
+      .then((res) => setCategories(asArray(res.data)))
+      .catch(() => setCategories([]));
   }, []);
 
   useEffect(() => {
@@ -42,7 +46,7 @@ export default function Shop() {
     api
       .get("/products/", { params })
       .then((res) => {
-        if (alive) setProducts(res.data);
+        if (alive) setProducts(asArray(res.data));
       })
       .catch(() => {
         if (alive) setProducts([]);

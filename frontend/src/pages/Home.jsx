@@ -12,6 +12,7 @@ import Spinner from "../components/ui/Spinner";
 import ContentCardView, { contentCardSpanClass } from "../components/ui/ContentCardView";
 import api from "../services/api";
 import { mediaUrl } from "../lib/mediaUrl";
+import { asArray } from "../lib/asArray";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const FALLBACK_BRAND = [
@@ -77,11 +78,13 @@ export default function Home() {
           api.get("/content-cards/", { params: { page_key: "home_honesty" } }).catch(() => ({ data: [] })),
         ]);
         if (alive) {
-          setFeatured(productsRes.data.slice(0, 4));
-          setOffers(offersRes.data.slice(0, 2));
-          setHeroImage(settingsRes.data.hero_image_url || null);
-          if (brandRes.data?.length) setBrandCards(brandRes.data);
-          if (honestyRes.data?.length) setHonestyCards(honestyRes.data);
+          setFeatured(asArray(productsRes.data).slice(0, 4));
+          setOffers(asArray(offersRes.data).slice(0, 2));
+          setHeroImage(settingsRes.data?.hero_image_url || null);
+          const brand = asArray(brandRes.data);
+          const honesty = asArray(honestyRes.data);
+          if (brand.length) setBrandCards(brand);
+          if (honesty.length) setHonestyCards(honesty);
         }
       } catch {
         if (alive) setFeatured([]);

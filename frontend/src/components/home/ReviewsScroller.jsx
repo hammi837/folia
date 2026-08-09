@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import api from "../../services/api";
+import { asArray } from "../../lib/asArray";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import SectionHeading from "../ui/SectionHeading";
 import Spinner from "../ui/Spinner";
@@ -23,7 +24,7 @@ export default function ReviewsScroller() {
   useEffect(() => {
     api
       .get("/reviews/", { params: { limit: 16 } })
-      .then((r) => setReviews(r.data || []))
+      .then((r) => setReviews(asArray(r.data)))
       .catch(() => setReviews([]))
       .finally(() => setLoading(false));
   }, []);

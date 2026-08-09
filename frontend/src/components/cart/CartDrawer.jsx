@@ -7,7 +7,7 @@ import Button from "../ui/Button";
 export default function CartDrawer() {
   const open = useUiStore((s) => s.cartOpen);
   const closeCart = useUiStore((s) => s.closeCart);
-  const items = useCartStore((s) => s.items);
+  const items = useCartStore((s) => (Array.isArray(s.items) ? s.items : []));
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const subtotal = useCartStore((s) => s.subtotal());
