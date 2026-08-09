@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
+import { mediaUrl } from "../lib/mediaUrl";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import Spinner from "../components/ui/Spinner";
@@ -8,6 +9,7 @@ import EmptyState from "../components/ui/EmptyState";
 import { useCartStore } from "../store/cartStore";
 import { useWishlistStore } from "../store/wishlistStore";
 import { useUiStore } from "../store/uiStore";
+import { asArray } from "../lib/asArray";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -62,7 +64,7 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images?.length ? product.images : [];
+  const images = asArray(product.images);
   const wished = wishlistIds.includes(product.id);
 
   const onAdd = () => {
@@ -82,7 +84,7 @@ export default function ProductDetail() {
           <div className="aspect-[4/5] overflow-hidden bg-folia-sand/40">
             {images[activeImage] ? (
               <img
-                src={images[activeImage].url}
+                src={mediaUrl(images[activeImage].url)}
                 alt={images[activeImage].alt || product.name}
                 className="h-full w-full object-cover"
               />
@@ -99,7 +101,7 @@ export default function ProductDetail() {
                     idx === activeImage ? "border-folia-moss" : "border-transparent"
                   }`}
                 >
-                  <img src={img.url} alt="" className="h-full w-full object-cover" />
+                  <img src={mediaUrl(img.url)} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>

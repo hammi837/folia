@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Button from "../components/ui/Button";
 import EmptyState from "../components/ui/EmptyState";
 import { useCartStore } from "../store/cartStore";
+import { mediaUrl } from "../lib/mediaUrl";
 
 export default function Cart() {
   const items = useCartStore((s) => s.items);
@@ -28,7 +29,9 @@ export default function Cart() {
           {items.map((item) => (
             <li key={item.key} className="flex gap-4 border-b border-folia-sand/70 pb-6">
               <Link to={`/product/${item.slug}`} className="h-28 w-24 overflow-hidden bg-folia-sand/40">
-                {item.image && <img src={item.image} alt="" className="h-full w-full object-cover" />}
+                {item.image && (
+                  <img src={mediaUrl(item.image)} alt="" className="h-full w-full object-cover" />
+                )}
               </Link>
               <div className="flex flex-1 flex-col justify-between">
                 <div className="flex justify-between gap-4">

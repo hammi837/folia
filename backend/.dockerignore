@@ -4,8 +4,6 @@ __pycache__
 .env
 .env.*
 !.env.example
-uploads/products/*
-!uploads/products/.gitkeep
 .pytest_cache
 .mypy_cache
 *.md

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCartStore } from "../../store/cartStore";
 import { useUiStore } from "../../store/uiStore";
 import Button from "../ui/Button";
+import { mediaUrl } from "../../lib/mediaUrl";
 
 export default function CartDrawer() {
   const open = useUiStore((s) => s.cartOpen);
@@ -48,7 +49,7 @@ export default function CartDrawer() {
                     <li key={item.key} className="flex gap-4">
                       <div className="h-20 w-16 overflow-hidden bg-folia-sand/50">
                         {item.image && (
-                          <img src={item.image} alt="" className="h-full w-full object-cover" />
+                          <img src={mediaUrl(item.image)} alt="" className="h-full w-full object-cover" />
                         )}
                       </div>
                       <div className="flex-1">

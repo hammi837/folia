@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Badge from "../ui/Badge";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { mediaUrl } from "../../lib/mediaUrl";
 
 export default function ProductCard({ product, index = 0 }) {
-  const image = product.images?.[0]?.url || product.image_url;
+  const image = mediaUrl(product.images?.[0]?.url || product.image_url);
   const price = Number(product.sale_price ?? product.price);
   const base = Number(product.price);
   const onSale = product.applied_discount_percent && price < base;
