@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -10,6 +10,8 @@ export default function Login() {
   const setSession = useAuthStore((s) => s.setSession);
   const showToast = useUiStore((s) => s.showToast);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +22,11 @@ export default function Login() {
       const { data } = await api.post("/auth/login", form);
       setSession(data.access_token, data.user);
       showToast("Welcome back");
-      navigate("/account");
+      const next =
+        searchParams.get("next") ||
+        location.state?.from ||
+        (data.user?.is_admin ? "/admin" : "/account");
+      navigate(next);
     } catch (err) {
       showToast(err.response?.data?.detail || "Login failed");
     } finally {
@@ -32,7 +38,10 @@ export default function Login() {
     <section className="mx-auto max-w-md px-4 py-16">
       <h1 className="font-display text-4xl">Login</h1>
       <p className="mt-2 text-sm text-folia-ink/55">
-        Demo: <span className="text-folia-ink">demo@folia.beauty</span> / folia123
+        Customer demo: <span className="text-folia-ink">demo@folia.beauty</span> / folia123
+      </p>
+      <p className="mt-1 text-sm text-folia-ink/55">
+        Admin: <span className="text-folia-ink">admin@folia.beauty</span> / admin123
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <Input

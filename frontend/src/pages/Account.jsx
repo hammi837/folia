@@ -40,6 +40,12 @@ export default function Account() {
           <h2 className="font-display text-xl">Skin quiz</h2>
           <p className="mt-2 text-sm text-folia-ink/55">Refresh your matches</p>
         </Link>
+        {user.is_admin && (
+          <Link to="/admin" className="rounded-2xl border border-folia-moss bg-folia-mist/60 p-6 hover:bg-folia-mist">
+            <h2 className="font-display text-xl">Admin panel</h2>
+            <p className="mt-2 text-sm text-folia-ink/55">Manage products, offers & orders</p>
+          </Link>
+        )}
       </div>
 
       <Button
