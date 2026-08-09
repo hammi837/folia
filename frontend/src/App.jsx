@@ -4,7 +4,6 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import CartDrawer from "./components/cart/CartDrawer";
 import Toast from "./components/ui/Toast";
-import IntroOverlay from "./components/layout/IntroOverlay";
 import AdminLayout from "./components/admin/AdminLayout";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -29,11 +28,11 @@ import AdminHomepage from "./pages/admin/AdminHomepage";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminContentCards from "./pages/admin/AdminContentCards";
 import { useAuthStore } from "./store/authStore";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 function StorefrontShell({ children }) {
   return (
     <div className="flex min-h-screen flex-col bg-folia-cream text-folia-ink">
-      <IntroOverlay />
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
@@ -54,7 +53,7 @@ export default function App() {
 
   if (isAdmin) {
     return (
-      <>
+      <ErrorBoundary>
         <Routes>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
@@ -69,27 +68,29 @@ export default function App() {
           </Route>
         </Routes>
         <Toast />
-      </>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <StorefrontShell>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/product/:slug" element={<ProductDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/quiz" element={<SkinQuiz />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/order-complete" element={<OrderComplete />} />
-      </Routes>
-    </StorefrontShell>
+    <ErrorBoundary>
+      <StorefrontShell>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/product/:slug" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/quiz" element={<SkinQuiz />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/order-complete" element={<OrderComplete />} />
+        </Routes>
+      </StorefrontShell>
+    </ErrorBoundary>
   );
 }

@@ -11,8 +11,10 @@ import {
 /** Redux-backed cart hook (same selector API as the old Zustand store). */
 export function useCartStore(selector) {
   const dispatch = useDispatch();
-  const items = useSelector((s) => s.cart.items);
-  const subtotalValue = useSelector(selectCartSubtotal);
+  const items = useSelector((s) => s.cart?.items ?? []);
+  const subtotalValue = useSelector((s) =>
+    (s.cart?.items ?? []).reduce((sum, i) => sum + Number(i.price || 0) * Number(i.quantity || 0), 0)
+  );
 
   const addItem = useCallback(
     (product, quantity = 1, variant = null) => {
@@ -43,7 +45,7 @@ export function useCartStore(selector) {
 
   const api = useMemo(
     () => ({
-      items,
+      items: Array.isArray(items) ? items : [],
       addItem,
       setQuantity,
       removeItem,

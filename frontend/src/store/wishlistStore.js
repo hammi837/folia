@@ -5,7 +5,7 @@ import { toggleWishlist, clearWishlist } from "./slices/wishlistSlice";
 /** Redux-backed wishlist hook (same selector API as the old Zustand store). */
 export function useWishlistStore(selector) {
   const dispatch = useDispatch();
-  const ids = useSelector((s) => s.wishlist.ids);
+  const ids = useSelector((s) => (Array.isArray(s.wishlist?.ids) ? s.wishlist.ids : []));
 
   const toggle = useCallback(
     (productId) => {

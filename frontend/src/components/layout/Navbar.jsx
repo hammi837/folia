@@ -16,7 +16,9 @@ const links = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const itemCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantity, 0));
+  const itemCount = useCartStore((s) =>
+    (Array.isArray(s.items) ? s.items : []).reduce((n, i) => n + (i.quantity || 0), 0)
+  );
   const user = useAuthStore((s) => s.user);
   const openCart = useUiStore((s) => s.openCart);
 
