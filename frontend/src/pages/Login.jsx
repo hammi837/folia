@@ -40,9 +40,6 @@ export default function Login() {
       <p className="mt-2 text-sm text-folia-ink/55">
         Customer demo: <span className="text-folia-ink">demo@folia.beauty</span> / folia123
       </p>
-      <p className="mt-1 text-sm text-folia-ink/55">
-        Admin: <span className="text-folia-ink">admin@folia.beauty</span> / admin123
-      </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <Input
           label="Email"
